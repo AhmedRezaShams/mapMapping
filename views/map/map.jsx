@@ -251,117 +251,43 @@ export default function MyMap() {
     // Remove from overlays array
     setOverlays((prev) => prev.filter((o) => o.id !== id));
   };
+  let staticMapUrl = "";
 
   const takeScreenshot = async () => {
     try {
-      // Get the main container element by ID
-      const containerElement = document.getElementById(
-        "map-screenshot-container"
-      );
-
-      if (!containerElement) {
-        alert("Could not find map container for screenshot.");
-        return;
-      }
-
-      // Show loading state
-      const loadingDiv = document.createElement("div");
-      loadingDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0,0,0,0.8);
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        z-index: 10000;
-        font-family: Arial, sans-serif;
-      `;
-      loadingDiv.textContent = "Capturing screenshot...";
-      document.body.appendChild(loadingDiv);
-
-      // Wait a moment for any animations to complete
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Configure html2canvas options for better quality
-      const canvas = await html2canvas(containerElement, {
-        useCORS: true,
-        allowTaint: false,
-        scale: 1,
-        logging: false,
-        width: containerElement.offsetWidth,
-        height: containerElement.offsetHeight,
-        backgroundColor: "#ffffff",
-        foreignObjectRendering: true,
-        imageTimeout: 15000,
-        removeContainer: true,
+      // Capture the entire tab
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { cursor: "never" },
+        audio: false,
+        preferCurrentTab: true,
       });
 
-      // Remove loading indicator
-      document.body.removeChild(loadingDiv);
+      const track = stream.getVideoTracks()[0];
+      const image = new ImageCapture(track);
+      const bitmap = await image.grabFrame();
 
-      // Convert canvas to blob and download
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `map-with-areas-${new Date()
-              .toISOString()
-              .slice(0, 19)
-              .replace(/:/g, "-")}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-          } else {
-            alert("Failed to generate screenshot. Please try again.");
-          }
-        },
-        "image/png",
-        0.95
-      );
-    } catch (error) {
-      console.error("Error taking screenshot:", error);
+      // Convert to blob and download
+      const canvas = document.createElement("canvas");
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(bitmap, 0, 0);
 
-      // Remove loading indicator if it exists
-      const loadingDiv = document.querySelector(
-        'div[style*="Capturing screenshot"]'
-      );
-      if (loadingDiv) {
-        document.body.removeChild(loadingDiv);
-      }
-
-      // Fallback: Try with simpler settings
-      try {
-        const containerElement = document.getElementById(
-          "map-screenshot-container"
-        );
-        const canvas = await html2canvas(containerElement, {
-          scale: 0.7,
-          backgroundColor: "#ffffff",
-          logging: false,
-          useCORS: true,
-        });
-
-        const dataUrl = canvas.toDataURL("image/png", 0.8);
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.href = dataUrl;
+        link.href = url;
         link.download = `map-screenshot-${new Date().getTime()}.png`;
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-      } catch (fallbackError) {
-        console.error("Fallback screenshot also failed:", fallbackError);
-        alert(
-          "Screenshot failed. This might be due to browser security restrictions with Google Maps. Try using your browser's built-in screenshot tool (Ctrl+Shift+S in Chrome) instead."
-        );
-      }
+        URL.revokeObjectURL(url);
+      });
+
+      track.stop();
+    } catch (error) {
+      console.error("Error with native screenshot:", error);
+      // Fallback to another method
     }
   };
-
   const clearAllDrawings = () => {
     // Clear all overlays from map using the area info list which has direct overlay references
     areaInfoList.forEach((area) => {
@@ -404,7 +330,16 @@ export default function MyMap() {
   };
 
   return (
-    <div className="relative w-full h-screen" id="map-screenshot-container">
+    <div
+      className="relative w-full h-screen"
+      id="map-screenshot-container"
+      // style={{
+      //   backgroundImage: staticMapUrl,
+      //   backgroundSize: "cover",
+      //   backgroundPosition: "center",
+      //   backgroundRepeat: "no-repeat",
+      // }}
+    >
       <LoadScript
         googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
         libraries={["drawing", "geometry"]}
