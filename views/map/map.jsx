@@ -28,48 +28,84 @@ const shapeColors = [
     text: "text-blue-500",
     border: "border-blue-500",
     name: "Blue",
+    hex: { bg: "#3b82f6", border: "#3b82f6" },
   },
   {
     bg: "bg-green-500",
     text: "text-green-500",
     border: "border-green-500",
     name: "Green",
+    hex: { bg: "#22c55e", border: "#22c55e" },
   },
   {
     bg: "bg-purple-500",
     text: "text-purple-500",
     border: "border-purple-500",
     name: "Purple",
+    hex: { bg: "#a855f7", border: "#a855f7" },
   },
   {
     bg: "bg-red-500",
     text: "text-red-500",
     border: "border-red-500",
     name: "Red",
+    hex: { bg: "#ef4444", border: "#ef4444" },
   },
   {
     bg: "bg-yellow-500",
     text: "text-yellow-500",
     border: "border-yellow-500",
     name: "Yellow",
+    hex: { bg: "#eab308", border: "#eab308" },
   },
   {
     bg: "bg-pink-500",
     text: "text-pink-500",
     border: "border-pink-500",
     name: "Pink",
+    hex: { bg: "#ec4899", border: "#ec4899" },
   },
   {
     bg: "bg-indigo-500",
     text: "text-indigo-500",
     border: "border-indigo-500",
     name: "Indigo",
+    hex: { bg: "#6366f1", border: "#6366f1" },
   },
   {
     bg: "bg-orange-500",
     text: "text-orange-500",
     border: "border-orange-500",
     name: "Orange",
+    hex: { bg: "#f97316", border: "#f97316" },
+  },
+  {
+    bg: "bg-teal-500",
+    text: "text-teal-500",
+    border: "border-teal-500",
+    name: "Teal",
+    hex: { bg: "#14b8a6", border: "#14b8a6" },
+  },
+  {
+    bg: "bg-cyan-500",
+    text: "text-cyan-500",
+    border: "border-cyan-500",
+    name: "Cyan",
+    hex: { bg: "#06b6d4", border: "#06b6d4" },
+  },
+  {
+    bg: "bg-lime-500",
+    text: "text-lime-500",
+    border: "border-lime-500",
+    name: "Lime",
+    hex: { bg: "#84cc16", border: "#84cc16" },
+  },
+  {
+    bg: "bg-amber-500",
+    text: "text-amber-500",
+    border: "border-amber-500",
+    name: "Amber",
+    hex: { bg: "#f59e0b", border: "#f59e0b" },
   },
 ];
 
@@ -119,6 +155,18 @@ export default function MyMap() {
       setOverlays((prev) => [...prev, { overlay: e.overlay, id }]);
 
       if (e.type === "polygon") {
+        e.overlay.setOptions({
+          fillColor: color.hex.bg,
+          strokeColor: color.hex.border,
+          strokeWeight: 3,
+          fillOpacity: 0.4,
+          strokeOpacity: 1,
+          clickable: true,
+          draggable: false,
+          editable: true,
+          geodesic: true,
+          zIndex: 1,
+        });
         const path = e.overlay.getPath().getArray();
         const coords = path.map((p) => ({ lat: p.lat(), lng: p.lng() }));
         area = window.google.maps.geometry.spherical.computeArea(path);
@@ -136,6 +184,18 @@ export default function MyMap() {
       }
 
       if (e.type === "circle") {
+        e.overlay.setOptions({
+          fillColor: color.hex.bg,
+          strokeColor: color.hex.border,
+          strokeWeight: 3,
+          fillOpacity: 0.4,
+          strokeOpacity: 1,
+          clickable: true,
+          draggable: false,
+          editable: true,
+          geodesic: true,
+          zIndex: 1,
+        });
         const radius = e.overlay.getRadius();
         area = Math.PI * radius * radius;
         info = {
@@ -152,6 +212,18 @@ export default function MyMap() {
       }
 
       if (e.type === "rectangle") {
+        e.overlay.setOptions({
+          fillColor: color.hex.bg,
+          strokeColor: color.hex.border,
+          strokeWeight: 3,
+          fillOpacity: 0.4,
+          strokeOpacity: 1,
+          clickable: true,
+          draggable: false,
+          editable: true,
+          geodesic: true,
+          zIndex: 1,
+        });
         const bounds = e.overlay.getBounds();
         const ne = bounds.getNorthEast();
         const sw = bounds.getSouthWest();
