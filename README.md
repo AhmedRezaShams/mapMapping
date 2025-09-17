@@ -4,6 +4,8 @@
 
 A React-based web application for drawing shapes on a Google Map, calculating their areas, and generating screenshots. This tool is built to provide a simple yet powerful interface for geographic area analysis.
 
+![Uploading map-screenshot-1758103390475.png…]()
+
 ## ✨ Features
 
   * **Interactive Drawing Tools:** Draw polygons, circles, and rectangles directly on the map.
