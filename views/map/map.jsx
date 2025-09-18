@@ -290,6 +290,44 @@ export default function MyMap() {
     }
   };
 
+  // Add this function to focus on a specific area
+  const focusOnArea = useCallback(
+    (area) => {
+      if (!mapInstance || !area.overlay) return;
+
+      try {
+        if (area.type === "Circle") {
+          const center = area.overlay.getCenter();
+          const radius = area.overlay.getRadius();
+
+          // Calculate bounds for circle
+          const bounds = new window.google.maps.Circle({
+            center: center,
+            radius: radius,
+          }).getBounds();
+
+          mapInstance.fitBounds(bounds);
+          mapInstance.setZoom(mapInstance.getZoom() - 3); // Slight zoom out for better view
+        } else if (area.type === "Polygon") {
+          const path = area.overlay.getPath();
+          const bounds = new window.google.maps.LatLngBounds();
+
+          for (let i = 0; i < path.getLength(); i++) {
+            bounds.extend(path.getAt(i));
+          }
+
+          mapInstance.fitBounds(bounds);
+        } else if (area.type === "Rectangle") {
+          const bounds = area.overlay.getBounds();
+          mapInstance.fitBounds(bounds);
+        }
+      } catch (error) {
+        console.warn("Error focusing on area:", error);
+      }
+    },
+    [mapInstance]
+  );
+
   const toggleAreaVisibility = (id) => {
     setAreaInfoList((prev) =>
       prev.map((area) => {
@@ -493,7 +531,8 @@ export default function MyMap() {
                       area.color.border
                     } transition-all duration-200 hover:shadow-lg ${
                       !area.visible ? "opacity-60" : ""
-                    }`}
+                    } cursor-pointer hover:border-l-8`}
+                    onClick={() => focusOnArea(area)}
                   >
                     <div className="p-4">
                       {/* Header */}
