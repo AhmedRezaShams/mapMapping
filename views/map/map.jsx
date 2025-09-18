@@ -12,7 +12,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 
 const containerStyle = {
   width: "100%",
@@ -326,40 +326,34 @@ export default function MyMap() {
   let staticMapUrl = "";
 
   const takeScreenshot = async () => {
+    const container = document.getElementById("map-container"); // your map container
+
+    if (!container) {
+      alert("Map container not ready");
+      return;
+    }
+
     try {
-      // Capture the entire tab
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { cursor: "never" },
-        audio: false,
-        preferCurrentTab: true,
+      const canvas = await html2canvas(container, {
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#ffffff",
+        scale: 2, // higher resolution
       });
 
-      const track = stream.getVideoTracks()[0];
-      const image = new ImageCapture(track);
-      const bitmap = await image.grabFrame();
-
-      // Convert to blob and download
-      const canvas = document.createElement("canvas");
-      canvas.width = bitmap.width;
-      canvas.height = bitmap.height;
-      const context = canvas.getContext("2d");
-      context.drawImage(bitmap, 0, 0);
-
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `map-screenshot-${new Date().getTime()}.png`;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-
-      track.stop();
-    } catch (error) {
-      console.error("Error with native screenshot:", error);
-      // Fallback to another method
+      const dataUrl = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `map-screenshot-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Error taking screenshot:", err);
+      alert("Screenshot failed, check console.");
     }
   };
+
   const clearAllDrawings = () => {
     // Clear all overlays from map using the area info list which has direct overlay references
     areaInfoList.forEach((area) => {
@@ -404,7 +398,7 @@ export default function MyMap() {
   return (
     <div
       className="relative w-full h-screen"
-      id="map-screenshot-container"
+      id="map-container"
       // style={{
       //   backgroundImage: staticMapUrl,
       //   backgroundSize: "cover",
