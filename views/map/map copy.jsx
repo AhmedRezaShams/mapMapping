@@ -667,7 +667,7 @@ export default function MyMap() {
         }
       }
     });
- kuch v 
+
     // Clear state
     setAreaInfoList([]);
     setOverlays([]);
