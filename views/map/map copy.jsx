@@ -654,7 +654,7 @@ export default function MyMap() {
     } else {
       alert("Map not loaded yet. Please wait a moment.");
     }
-  };
+  };sadf
 
   const clearAllDrawings = () => {
     // Clear all overlays from map using the area info list which has direct overlay references
