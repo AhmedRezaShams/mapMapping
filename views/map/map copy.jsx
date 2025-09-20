@@ -666,7 +666,7 @@ export default function MyMap() {
           console.warn("Error removing overlay:", error);
         }
       }
-    });
+    });sdf
 
     // Clear state
     setAreaInfoList([]);
