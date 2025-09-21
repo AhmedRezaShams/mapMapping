@@ -655,7 +655,7 @@ export default function MyMap() {
       alert("Map not loaded yet. Please wait a moment.");
     }
   }
-
+asdf
   const clearAllDrawings = () => {
     // Clear all overlays from map using the area info list which has direct overlay references
     areaInfoList.forEach((area) => {
